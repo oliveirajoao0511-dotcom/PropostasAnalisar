@@ -14,8 +14,8 @@ OUTPUT_DIR = BASE_DIR / "saida"
 DOCS_DIR.mkdir(exist_ok=True)
 OUTPUT_DIR.mkdir(exist_ok=True)
 
-# Chave da API do Gemini
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# Chave da API do Anthropic
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 
 # Configurações padrão do pregão (podem ser sobrescritas via CLI/argumentos)
 DEFAULT_UASG = "120001"

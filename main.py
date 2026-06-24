@@ -5,7 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Importações dos módulos locais
-from config import BASE_DIR, DOCS_DIR, OUTPUT_DIR, DEFAULT_UASG, DEFAULT_NUM_COMPRA, DEFAULT_OBJETO, GEMINI_API_KEY
+from config import BASE_DIR, DOCS_DIR, OUTPUT_DIR, DEFAULT_UASG, DEFAULT_NUM_COMPRA, DEFAULT_OBJETO, ANTHROPIC_API_KEY
 from pdf_extractor import extract_text_from_pdf
 from ai_analyzer import AIAnalyzer
 from excel_generator import generate_excel_report
@@ -119,10 +119,10 @@ def main():
         return
 
     # Verifica a existência da chave de API
-    if not GEMINI_API_KEY:
-        print("[ERRO] GEMINI_API_KEY não encontrada nas variáveis de ambiente.")
+    if not ANTHROPIC_API_KEY:
+        print("[ERRO] ANTHROPIC_API_KEY não encontrada nas variáveis de ambiente.")
         print("Por favor, crie um arquivo '.env' na raiz do projeto com:")
-        print("GEMINI_API_KEY=sua_chave_aqui")
+        print("ANTHROPIC_API_KEY=sua_chave_aqui")
         sys.exit(1)
     
     print("=====================================================================")

@@ -1,8 +1,8 @@
-# Analisador de Propostas Comercial (Web App)
+# Analisador de Propostas Comercial (Web App - Anthropic Claude)
 
 Este aplicativo web automatiza a extração e o confronto técnico de propostas comerciais de fornecedores com as exigências descritas no Termo de Referência (TR). 
 
-Utiliza a API do **Google Gemini** para extração estruturada de dados e cruzamento semântico, gerando um relatório em formato Excel (.xlsx) altamente customizado, com menus dropdown interativos e hiperlinks locais para consulta imediata dos PDFs originais.
+Utiliza a API do **Anthropic Claude 3.5 Sonnet** (via Tool Calling e processamento nativo de PDFs) para extração estruturada de dados e cruzamento semântico, gerando um relatório em formato Excel (.xlsx) altamente customizado, com menus dropdown interativos e hiperlinks locais para consulta imediata dos PDFs originais.
 
 ---
 
@@ -11,23 +11,20 @@ Utiliza a API do **Google Gemini** para extração estruturada de dados e cruzam
 ### Pré-requisitos
 Certifique-se de ter o Python 3.10+ instalado no seu computador.
 
-### Passo 1: Clone ou Copie a Pasta do Projeto
-Abra o terminal no diretório do projeto.
-
-### Passo 2: Instale as Dependências
+### Passo 1: Instale as Dependências
 Execute o comando abaixo para instalar todas as bibliotecas necessárias:
 ```bash
 pip install -r requirements.txt
 ```
 
-### Passo 3: Configure as Variáveis de Ambiente
+### Passo 2: Configure as Variáveis de Ambiente
 1. Copie o arquivo `.env.example` e renomeie para `.env`.
-2. Insira sua chave de API do Gemini no arquivo `.env`:
+2. Insira sua chave de API da Anthropic no arquivo `.env`:
    ```env
-   GEMINI_API_KEY=sua_chave_aqui
+   ANTHROPIC_API_KEY=sua_chave_aqui
    ```
 
-### Passo 4: Execute o Aplicativo
+### Passo 3: Execute o Aplicativo
 Inicie a interface web do Streamlit:
 ```bash
 streamlit run app.py
@@ -36,33 +33,25 @@ O aplicativo abrirá automaticamente no seu navegador padrão (geralmente em `ht
 
 ---
 
-## 🌐 Como Publicar no GitHub e Hospedar na Nuvem (Gratuito)
+## 🌐 Como Publicar no GitHub e Hospedar no Render
 
-Você pode publicar este projeto no **GitHub** e colocá-lo no ar no **Streamlit Community Cloud** para que qualquer pessoa do seu setor acesse através de um link de forma segura.
+Você pode hospedar este projeto de forma pública ou privada no **Render** com deploy automático a partir do seu repositório no **GitHub**.
 
-### Passo A: Criar Repositório no GitHub
-1. Crie uma conta no [GitHub](https://github.com/) (se não tiver).
-2. Crie um novo repositório chamado `analisador-de-propostas`.
-3. Adicione os arquivos do projeto a este repositório.
-   *   **⚠️ IMPORTANTE:** Nunca publique o arquivo `.env` contendo a sua API Key real no GitHub. O arquivo `.gitignore` padrão do git impede isso. Deixe apenas o `.env.example`.
+### Passo A: Enviar para o GitHub
+Envie todos os arquivos do projeto para o seu repositório.
+*   **⚠️ IMPORTANTE:** Nunca publique o arquivo `.env` contendo a sua API Key real no GitHub. O arquivo `.gitignore` padrão impede isso.
 
-### Passo B: Criar Conta no Streamlit Cloud
-1. Acesse [Streamlit Community Cloud](https://share.streamlit.io/) e faça login usando a sua conta do GitHub.
-2. Clique em **"New app"** (Novo aplicativo).
+### Passo B: Configurar no Render.com
+1. Crie um novo **Web Service** e conecte o repositório do seu GitHub.
+2. Defina os seguintes parâmetros no painel do Render:
+   - **Language:** `Python`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `streamlit run app.py --server.port $PORT --server.address 0.0.0.0`
+   - **Plan:** `Free`
 
-### Passo C: Configurar o Deploy
-Preencha os campos da seguinte forma:
-- **Repository:** Selecione o seu repositório `seu-usuario/analisador-de-propostas`
-- **Branch:** `main` (ou `master`)
-- **Main file path:** `app.py`
-
-### Passo D: Configurar a Chave do Gemini com Segurança
-Antes de clicar em Deploy:
-1. Clique em **"Advanced Settings"** (Configurações Avançadas) no formulário do Streamlit.
-2. Na área **"Secrets"**, digite a sua chave de API conforme abaixo:
-   ```toml
-   GEMINI_API_KEY = "sua-api-key-real-aqui"
-   ```
-3. Salve e clique em **"Deploy!"**.
-
-O aplicativo será construído em alguns minutos e você receberá um link público (ex: `https://analisador-de-propostas.streamlit.app`) para compartilhar com a sua seção! Os usuários poderão usar suas próprias chaves de API digitando diretamente na barra lateral se preferirem não deixar uma fixa.
+### Passo C: Configurar a Chave da Anthropic no Render
+1. Vá para a aba **"Environment"** do seu Web Service no Render.
+2. Adicione a seguinte variável chave-valor:
+   *   **Key:** `ANTHROPIC_API_KEY`
+   *   **Value:** *(Cole a sua chave de API obtida no Anthropic Console)*
+3. Clique em **"Save Changes"**. O Render fará o deploy e gerará o link acessível para a sua equipe!

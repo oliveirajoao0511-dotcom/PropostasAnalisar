@@ -54,27 +54,30 @@ st.markdown("<p class='subtitle'>Extração de dados via OCR/IA e Confronto Téc
 st.sidebar.markdown("### ⚙️ Configurações de API")
 
 # Tenta carregar a chave de API das variáveis de ambiente ou segredos do Streamlit
-default_api_key = os.getenv("GEMINI_API_KEY", "")
-if not default_api_key and "GEMINI_API_KEY" in st.secrets:
-    default_api_key = st.secrets["GEMINI_API_KEY"]
+default_api_key = os.getenv("ANTHROPIC_API_KEY", "")
+try:
+    if not default_api_key and "ANTHROPIC_API_KEY" in st.secrets:
+        default_api_key = st.secrets["ANTHROPIC_API_KEY"]
+except Exception:
+    pass
 
 api_key_input = st.sidebar.text_input(
-    "Chave de API do Gemini",
+    "Chave de API da Anthropic",
     value=default_api_key,
     type="password",
-    help="Obtenha uma chave gratuita no Google AI Studio (https://aistudio.google.com/)"
+    help="Obtenha uma chave no painel do Anthropic Console (https://console.anthropic.com/)"
 )
 
 # Injeta a chave de API na configuração para o ai_analyzer ler
 if api_key_input:
-    os.environ["GEMINI_API_KEY"] = api_key_input
+    os.environ["ANTHROPIC_API_KEY"] = api_key_input
 
 # Seleção de Modelo para contornar instabilidades/altas demandas temporárias
 model_selection = st.sidebar.selectbox(
-    "Modelo de IA (Gemini)",
-    options=["gemini-2.0-flash", "gemini-2.5-flash"],
+    "Modelo de IA (Claude)",
+    options=["claude-3-5-sonnet-20241022", "claude-3-5-sonnet-latest"],
     index=0,
-    help="Caso o modelo selecionado apresente erro 503 (indisponível/alta demanda), selecione outra versão (ex: gemini-2.5-flash ou gemini-2.0-flash) e tente novamente."
+    help="O modelo Claude 3.5 Sonnet é o recomendado para processamento multimodal e análise técnica de documentos."
 )
 
 st.sidebar.markdown("---")
@@ -128,7 +131,7 @@ btn_analise = st.button("🚀 Iniciar Análise Técnica", use_container_width=Tr
 if btn_analise:
     # Validações Iniciais
     if not api_key_input:
-        st.error("❌ Por favor, informe a Chave de API do Gemini na barra lateral para continuar.")
+        st.error("❌ Por favor, informe a Chave de API da Anthropic na barra lateral para continuar.")
     elif not tr_file:
         st.error("❌ Por favor, carregue o PDF do Termo de Referência (TR).")
     elif not propostas_files:
