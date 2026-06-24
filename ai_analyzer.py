@@ -7,8 +7,8 @@ from google.genai import types
 
 from config import GEMINI_API_KEY
 
-# Define o modelo padrão da API do Gemini
-MODEL_NAME = "gemini-2.5-flash"  # Modelo recomendado pela Google para processamento multimodal rápido e de baixo custo
+# Define o modelo padrão da API do Gemini como fallback
+DEFAULT_MODEL_NAME = "gemini-1.5-flash"
 
 # =====================================================================
 # Modelos Pydantic para Saídas Estruturadas
@@ -46,13 +46,14 @@ class ConfrontoItem(BaseModel):
 # =====================================================================
 
 class AIAnalyzer:
-    def __init__(self):
+    def __init__(self, model_name: str = DEFAULT_MODEL_NAME):
         if not GEMINI_API_KEY:
             raise ValueError(
                 "A chave GEMINI_API_KEY não foi encontrada. "
                 "Crie um arquivo .env na raiz do projeto contendo: GEMINI_API_KEY=sua_chave_aqui"
             )
         self.client = genai.Client(api_key=GEMINI_API_KEY)
+        self.model_name = model_name
 
     def _obter_conteudo_input(self, pdf_path: Path, ext_result: dict) -> list:
         """
@@ -92,7 +93,7 @@ class AIAnalyzer:
         conteudo.append(prompt)
         
         response = self.client.models.generate_content(
-            model=MODEL_NAME,
+            model=self.model_name,
             contents=conteudo,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -125,7 +126,7 @@ class AIAnalyzer:
         conteudo.append(prompt)
         
         response = self.client.models.generate_content(
-            model=MODEL_NAME,
+            model=self.model_name,
             contents=conteudo,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -174,7 +175,7 @@ class AIAnalyzer:
             confrontos: List[ConfrontoItem]
             
         response = self.client.models.generate_content(
-            model=MODEL_NAME,
+            model=self.model_name,
             contents=[prompt],
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",

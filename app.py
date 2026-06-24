@@ -69,6 +69,14 @@ api_key_input = st.sidebar.text_input(
 if api_key_input:
     os.environ["GEMINI_API_KEY"] = api_key_input
 
+# Seleção de Modelo para contornar instabilidades/altas demandas temporárias
+model_selection = st.sidebar.selectbox(
+    "Modelo de IA (Gemini)",
+    options=["gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.5-flash"],
+    index=0,
+    help="Caso o modelo selecionado apresente erro 503 (indisponível/alta demanda), selecione outra versão (ex: gemini-1.5-flash) e tente novamente."
+)
+
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
 ### 📖 Como usar:
@@ -153,9 +161,9 @@ if btn_analise:
             status_text = st.empty()
             
             try:
-                # Inicializa o analisador de IA
-                status_text.markdown("🔄 *Inicializando motor de Inteligência Artificial...*")
-                analyzer = AIAnalyzer()
+                # Inicializa o analisador de IA com o modelo selecionado
+                status_text.markdown(f"🔄 *Inicializando motor de Inteligência Artificial ({model_selection})...*")
+                analyzer = AIAnalyzer(model_name=model_selection)
                 prog_bar.progress(10)
                 
                 # 2. Extrair dados do Termo de Referência (TR)
