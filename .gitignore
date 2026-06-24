@@ -1,0 +1,22 @@
+# Variáveis de ambiente (Chaves de API)
+.env
+
+# Pastas de dados locais (arquivos de entrada e saída gerados nos testes)
+documentos/
+saida/
+*.zip
+
+# Arquivos do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Arquivos temporários do sistema
+.DS_Store
+Thumbs.db
