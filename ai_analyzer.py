@@ -1,9 +1,11 @@
 import json
+import time
 from pathlib import Path
 from typing import List, Optional
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
+from google.genai.errors import ClientError, ServerError
 
 from config import GEMINI_API_KEY
 
@@ -41,6 +43,46 @@ class ConfrontoItem(BaseModel):
     status_sugerido: str = Field(description="Status sugerido para o item. Escolha obrigatória entre: 'Aceito', 'Não aceito', 'Pendência'")
 
 
+# Decorador para tratamento de Rate Limits (429) e Sobrecargas Temporárias (503)
+def retry_on_rate_limit(max_retries=5, initial_delay=5):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            delay = initial_delay
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    err_str = str(e).lower()
+                    is_rate_limit = "429" in err_str or "resource_exhausted" in err_str or "quota" in err_str
+                    is_unavailable = "503" in err_str or "unavailable" in err_str or "demand" in err_str
+                    
+                    if is_rate_limit or is_unavailable:
+                        wait_time = delay
+                        if "retry in" in err_str:
+                            try:
+                                parts = err_str.split("retry in")
+                                if len(parts) > 1:
+                                    sec_str = parts[1].strip().split("s")[0].strip()
+                                    wait_time = float(sec_str) + 3.0
+                            except Exception:
+                                pass
+                        
+                        print(f"⚠️ [API Gemini] Rate Limit ou Sobrecarga. Aguardando {wait_time:.1f}s antes da tentativa {attempt + 1}/{max_retries}...")
+                        try:
+                            import streamlit as st
+                            st.warning(f"⚠️ Limite da API do Gemini atingido. Aguardando {wait_time:.0f}s para prosseguir de forma segura...")
+                        except Exception:
+                            pass
+                        
+                        time.sleep(wait_time)
+                        delay *= 2
+                    else:
+                        raise e
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
 # =====================================================================
 # Classe de Análise por Inteligência Artificial
 # =====================================================================
@@ -75,6 +117,7 @@ class AIAnalyzer:
             print(f"  [IA] PDF '{pdf_path.name}' contém texto nativo. Enviando texto extraído...")
             return [f"Texto extraído do documento PDF:\n\n{ext_result['text']}"]
 
+    @retry_on_rate_limit(max_retries=5, initial_delay=5)
     def extrair_termos_de_referencia(self, pdf_path: Path, ext_result: dict) -> TRDados:
         """
         Analisa o PDF do Termo de Referência e extrai os itens exigidos estruturalmente.
@@ -105,6 +148,7 @@ class AIAnalyzer:
         # O retorno é parseado conforme o schema Pydantic TRDados
         return TRDados.model_validate_json(response.text)
 
+    @retry_on_rate_limit(max_retries=5, initial_delay=5)
     def extrair_proposta(self, pdf_path: Path, ext_result: dict) -> SupplierProposal:
         """
         Analisa o PDF da Proposta Comercial e extrai os dados do fornecedor e itens ofertados.
@@ -137,6 +181,7 @@ class AIAnalyzer:
         
         return SupplierProposal.model_validate_json(response.text)
 
+    @retry_on_rate_limit(max_retries=5, initial_delay=5)
     def confrontar_proposta_com_tr(self, tr_itens: List[TRItem], proposta_itens: List[ProposalItem]) -> List[ConfrontoItem]:
         """
         Compara os itens ofertados na proposta com os itens exigidos no Termo de Referência (TR).
