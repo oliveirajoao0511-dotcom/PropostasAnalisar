@@ -8,7 +8,7 @@ from google.genai import types
 from config import GEMINI_API_KEY
 
 # Define o modelo padrão da API do Gemini como fallback
-DEFAULT_MODEL_NAME = "gemini-1.5-flash"
+DEFAULT_MODEL_NAME = "gemini-2.0-flash"
 
 # =====================================================================
 # Modelos Pydantic para Saídas Estruturadas

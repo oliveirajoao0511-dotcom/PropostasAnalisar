@@ -72,9 +72,9 @@ if api_key_input:
 # Seleção de Modelo para contornar instabilidades/altas demandas temporárias
 model_selection = st.sidebar.selectbox(
     "Modelo de IA (Gemini)",
-    options=["gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.5-flash"],
+    options=["gemini-2.0-flash", "gemini-2.5-flash"],
     index=0,
-    help="Caso o modelo selecionado apresente erro 503 (indisponível/alta demanda), selecione outra versão (ex: gemini-1.5-flash) e tente novamente."
+    help="Caso o modelo selecionado apresente erro 503 (indisponível/alta demanda), selecione outra versão (ex: gemini-2.5-flash ou gemini-2.0-flash) e tente novamente."
 )
 
 st.sidebar.markdown("---")
